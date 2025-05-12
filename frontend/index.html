@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>University Support Center</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="/static/main.js" defer></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>University Support Center</h1>
+            <p class="tagline">Your AI guides to university resources and information</p>
+        </header>
+
+        <div class="chat-container">
+            <div class="agent-info">
+                <div id="agent-name">Triage Agent</div>
+                <div class="chat-actions">
+                    <button id="new-chat" class="primary-button">New Chat</button>
+                    <button id="clear-chat">Clear Chat</button>
+                </div>
+            </div>
+            
+            <div id="chat-messages" class="messages">
+                <div class="message system">
+                    <div class="message-content">
+                        <p>Welcome to the University Support Center! I'm the Triage Agent. How can I help you today?</p>
+                        <p>You can ask me about:</p>
+                        <ul>
+                            <li>Course recommendations and academic advising</li>
+                            <li>Campus culture and social events (our poet will answer in haiku)</li>
+                            <li>Class schedules, deadlines, and academic dates</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="chat-input">
+                <textarea id="user-input" placeholder="Type your question here..." rows="3"></textarea>
+                <button id="send-button">Send</button>
+            </div>
+        </div>
+
+        <footer>
+            <p>University Support System - Multi-Agent Swarm Orchestration</p>
+            <p class="small">Powered by OpenAI Swarm</p>
+        </footer>
+    </div>
+</body>
+</html>

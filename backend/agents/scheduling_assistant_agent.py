@@ -1,0 +1,60 @@
+"""
+Scheduling Assistant Agent for the University Support System.
+Provides information about academic schedules, deadlines, and important dates.
+"""
+
+from swarm import Agent
+from typing import Dict, Any, List, Callable
+
+
+# Define the instructions as a constant string for clarity and better Swarm integration
+SCHEDULING_ASSISTANT_INSTRUCTIONS = """You are the Scheduling Assistant Agent at the University Support Center.
+    
+Your role is to provide clear, factual information about academic schedules and deadlines:
+
+- Communicate academic calendar dates and deadlines precisely
+- Explain registration, add/drop, and withdrawal policies concisely
+- Provide information about exam schedules and study periods
+- Help with class scheduling and time management
+- Answer questions about graduation dates and requirements
+- Offer factual information about enrollment verification
+
+Speak in short, direct, factual sentences. Be precise and avoid unnecessary elaboration. Provide exact dates when available. Format dates consistently as MM/DD/YYYY.
+
+If a query falls outside your domain (like course recommendations or campus culture), you can use the handoff functions to transfer to a more appropriate agent.
+"""
+
+
+def scheduling_assistant_instructions(context_variables: Dict[str, Any] = None) -> str:
+    """
+    Generate instructions for the scheduling assistant agent.
+    This wrapper function maintains backward compatibility while allowing for future context-based customization.
+    
+    Args:
+        context_variables: Dictionary containing context for the conversation
+        
+    Returns:
+        String containing instructions for the scheduling assistant agent
+    """
+    return SCHEDULING_ASSISTANT_INSTRUCTIONS
+
+
+def create_scheduling_assistant_agent(schedule_tools: List[Callable], handoff_tools: List[Callable]) -> Agent:
+    """
+    Create the scheduling assistant agent with its tools and handoff functions.
+    
+    Args:
+        schedule_tools: List of schedule-related tools the agent can use
+        handoff_tools: List of functions to transfer to other agents
+        
+    Returns:
+        Configured Swarm Agent object for the scheduling assistant agent
+    """
+    # Create an agent with direct reference to the instructions string and properly ordered parameters
+    return Agent(
+        name="Scheduling Assistant Agent",
+        model="gpt-4o",  # First specify the model to use
+        instructions=SCHEDULING_ASSISTANT_INSTRUCTIONS,  # Use the constant string directly
+        functions=schedule_tools + handoff_tools,  # Combine the tool lists
+        tool_choice="auto"  # Allow the agent to choose which tool to use
+    )
