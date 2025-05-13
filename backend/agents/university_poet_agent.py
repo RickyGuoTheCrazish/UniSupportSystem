@@ -46,6 +46,29 @@ def university_poet_instructions(context_variables: Dict[str, Any] = None) -> st
     return UNIVERSITY_POET_INSTRUCTIONS
 
 
+def poet_tool_handler(tool_calls) -> str:
+    """
+    Custom handler to process tool call results for the university poet agent.
+    
+    Args:
+        tool_calls: The results from tool calls
+        
+    Returns:
+        String response based on tool call results
+    """
+    # Special handling for different tools
+    if tool_calls and len(tool_calls) > 0:
+        # Extract the tool call result
+        tool_result = tool_calls[0].get('result', 'No result available')
+        print(f"TOOL HANDLER: Found poet tool result of length {len(tool_result) if tool_result else 0}")
+        
+        # Return the full result for poetry tools
+        return tool_result
+    
+    print("TOOL HANDLER: No tool calls found, allowing agent response")
+    return None  # Allow the agent to generate its own response if no tool was called
+
+
 def create_university_poet_agent(poet_tools: List[Callable], handoff_tools: List[Callable]) -> Agent:
     """
     Create the university poet agent with its tools and handoff functions.
@@ -63,5 +86,6 @@ def create_university_poet_agent(poet_tools: List[Callable], handoff_tools: List
         model="gpt-4o",  # First specify the model to use
         instructions=UNIVERSITY_POET_INSTRUCTIONS,  # Use the constant string directly
         functions=poet_tools + handoff_tools,  # Combine the tool lists
+        function_call_handler=poet_tool_handler,  # Custom handler for tool results
         tool_choice="auto"  # Allow the agent to choose which tool to use
     )

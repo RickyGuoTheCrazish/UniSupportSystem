@@ -16,6 +16,8 @@ from agents.scheduling_assistant_agent import create_scheduling_assistant_agent
 
 # Import tool modules
 from tools.course_tools import recommend_courses, check_course_prerequisites, compare_course_paths, get_course_info
+from tools.poet_tools import get_poetry_inspiration, generate_haiku
+from tools.schedule_tools import get_semester_dates
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -41,22 +43,37 @@ def get_agent_by_name(agent_name):
         return "Transferring to Scheduling Assistant Agent"
     
     # Define course tools as actual callable functions
-    def recommend_courses_func(interest, count=3):
+    def recommend_courses_func(interest: str, count: int = 3) -> str:
         """Recommend courses based on student interest."""
         return recommend_courses(interest, count)
     
-    def check_prerequisites_func(course_code):
+    def check_prerequisites_func(course_code: str) -> str:
         """Check prerequisites for a course."""
         return check_course_prerequisites(course_code)
     
-    def compare_paths_func(path1, path2):
+    def compare_paths_func(path1: str, path2: str) -> str:
         """Compare two academic paths."""
         return compare_course_paths(path1, path2)
     
-    def get_course_info_func(course_code):
+    def get_course_info_func(course_code: str) -> str:
         """Get detailed course info."""
         return get_course_info(course_code)
+
+    # Poet tool wrapper functions
+    def get_poetry_inspiration_func(topic: str) -> str:
+        """Get poetry inspiration."""
+        return get_poetry_inspiration(topic)
     
+    def generate_haiku_func(topic: str) -> str:
+        """Generate a haiku."""
+        return generate_haiku(topic)
+    
+    # Schedule tool wrapper functions
+    def get_semester_dates_func(semester: str) -> str:
+        """Get semester dates."""
+        # Context variables are not needed for our simplified implementation
+        return get_semester_dates({}, semester)
+
     # Create a dictionary mapping function names to the actual callable functions
     # This matches what create_triage_agent expects
     handoff_functions = {
@@ -72,11 +89,16 @@ def get_agent_by_name(agent_name):
         get_course_info_func
     ]
     
-    # For the poet agent, we don't have specific tools, so use an empty list
-    poet_tools = []
+    # Poet tool functions for the University Poet Agent
+    poet_tools = [
+        get_poetry_inspiration_func,
+        generate_haiku_func
+    ]
     
-    # For scheduling assistant, we don't have specific tools yet either
-    scheduling_tools = []
+    # Scheduling tool functions for the Scheduling Assistant Agent
+    scheduling_tools = [
+        get_semester_dates_func
+    ]
     
     # Return the appropriate agent
     if agent_name == "triage_agent":

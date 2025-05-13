@@ -39,6 +39,29 @@ def scheduling_assistant_instructions(context_variables: Dict[str, Any] = None) 
     return SCHEDULING_ASSISTANT_INSTRUCTIONS
 
 
+def scheduling_tool_handler(tool_calls) -> str:
+    """
+    Custom handler to process tool call results for the scheduling assistant agent.
+    
+    Args:
+        tool_calls: The results from tool calls
+        
+    Returns:
+        String response based on tool call results
+    """
+    # Special handling for different tools
+    if tool_calls and len(tool_calls) > 0:
+        # Extract the tool call result
+        tool_result = tool_calls[0].get('result', 'No result available')
+        print(f"TOOL HANDLER: Found scheduling tool result of length {len(tool_result) if tool_result else 0}")
+        
+        # Return the full result for scheduling tools
+        return tool_result
+    
+    print("TOOL HANDLER: No tool calls found, allowing agent response")
+    return None  # Allow the agent to generate its own response if no tool was called
+
+
 def create_scheduling_assistant_agent(schedule_tools: List[Callable], handoff_tools: List[Callable]) -> Agent:
     """
     Create the scheduling assistant agent with its tools and handoff functions.
@@ -56,5 +79,6 @@ def create_scheduling_assistant_agent(schedule_tools: List[Callable], handoff_to
         model="gpt-4o",  # First specify the model to use
         instructions=SCHEDULING_ASSISTANT_INSTRUCTIONS,  # Use the constant string directly
         functions=schedule_tools + handoff_tools,  # Combine the tool lists
+        function_call_handler=scheduling_tool_handler,  # Custom handler for tool results
         tool_choice="auto"  # Allow the agent to choose which tool to use
     )
