@@ -72,15 +72,21 @@ def get_agent_by_name(agent_name):
         get_course_info_func
     ]
     
+    # For the poet agent, we don't have specific tools, so use an empty list
+    poet_tools = []
+    
+    # For scheduling assistant, we don't have specific tools yet either
+    scheduling_tools = []
+    
     # Return the appropriate agent
     if agent_name == "triage_agent":
         return create_triage_agent(handoff_functions)
     elif agent_name == "course_advisor_agent":
         return create_course_advisor_agent(course_tools, list(handoff_functions.values()))
     elif agent_name == "university_poet_agent":
-        return create_university_poet_agent()
+        return create_university_poet_agent(poet_tools, list(handoff_functions.values()))
     elif agent_name == "scheduling_assistant_agent":
-        return create_scheduling_assistant_agent()
+        return create_scheduling_assistant_agent(scheduling_tools, list(handoff_functions.values()))
     else:
         # Default to triage agent if unknown
         return create_triage_agent(handoff_functions)
@@ -130,15 +136,26 @@ def process_query(user_query: str, session_messages: list, current_agent: str = 
             if not msg:
                 continue
                 
+            # Create a copy to modify
+            msg_copy = msg.copy()
+                
             # Handle 'tool' role compatibility
-            if msg.get('role') == 'tool':
-                msg_copy = msg.copy()
+            if msg_copy.get('role') == 'tool':
                 msg_copy['role'] = 'function'
-                if 'name' not in msg_copy and msg_copy.get('function_name'):
-                    msg_copy['name'] = msg_copy.get('function_name')
+                
+            # Ensure function messages have a name parameter
+            if msg_copy.get('role') == 'function':
+                if 'name' not in msg_copy:
+                    # Try to get name from function_name
+                    if msg_copy.get('function_name'):
+                        msg_copy['name'] = msg_copy.get('function_name')
+                    else:
+                        # Default name if none is found
+                        msg_copy['name'] = 'generic_function'
+                    
+            # Only add messages with actual content or function/tool calls
+            if msg_copy.get('content') or msg_copy.get('function_call') or msg_copy.get('tool_calls'):
                 filtered_messages.append(msg_copy)
-            elif msg.get('content') or msg.get('function_call') or msg.get('tool_calls'):
-                filtered_messages.append(msg)
         
         # Add the current user message
         filtered_messages.append({"role": "user", "content": user_query})
@@ -173,6 +190,7 @@ def process_query(user_query: str, session_messages: list, current_agent: str = 
                 
                 # Check for handoff text indicators, but only if content is not None
                 if content is not None:
+                    # Check for explicit function calls
                     if 'call_course_advisor_agent' in content:
                         new_agent = "course_advisor_agent"
                         handoff_detected = True
@@ -185,6 +203,11 @@ def process_query(user_query: str, session_messages: list, current_agent: str = 
                         new_agent = "scheduling_assistant_agent"
                         handoff_detected = True
                         print("Handoff detected to Scheduling Assistant Agent")
+                    # Also check for more natural language references to culture or poetry
+                    elif any(x in content.lower() for x in ['transfer to university poet', 'transfer to poet', 'university poet agent', 'culture agent']):
+                        new_agent = "university_poet_agent"
+                        handoff_detected = True
+                        print("Handoff detected to University Poet Agent via natural language")
         
         # Handle handoff if detected
         if handoff_detected:
