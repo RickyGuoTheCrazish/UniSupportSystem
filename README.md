@@ -42,7 +42,7 @@ The system consists of:
    SECRET_KEY=django-insecure-key-for-development-only
    ```
 
-3. **Run database migrations(for initializing db)**
+3. **Run database migrations(for initializing db, only need to do this once, might be a bit slow around 30 seconds)**
    ```bash
    cd backend
    python3 manage.py migrate
@@ -67,7 +67,7 @@ Test different agents with these example queries:
 
 - **Course Advisor**: "What courses should I take for data science?"
 - **University Poet**: "Tell me about campus life in haiku form"
-- **Scheduling Assistant**: "Can you show me calendar year schedule of Fall 2025?"
+- **Scheduling Assistant**: "Can you show me academic important dates of Fall 2025?"
 
 The Triage Agent will automatically route your query to the appropriate specialist agent.
 

@@ -26,7 +26,7 @@ For all other topic-specific questions, when handling requests follow this exact
 Here's when to use each specialized agent:
 - Course Advisor Agent: For SPECIFIC questions about courses, majors, prerequisites, academic planning, degree requirements, etc.
 - University Poet Agent: For SPECIFIC questions about campus life, culture, traditions, social events, clubs, etc.
-- Scheduling Assistant Agent: For SPECIFIC questions about deadlines, academic calendar, exam schedules, registration dates, etc.
+- Scheduling Assistant Agent: For SPECIFIC questions about deadlines, academic calendar, exam schedules, registration dates, university policies etc.
 
 Examples of correct responses:
 
