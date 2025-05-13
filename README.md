@@ -28,7 +28,7 @@ The system consists of:
 
 ### Setup
 
-1. **Unzip the folder , get into the root directory and install dependencies**
+1. **Unzip the folder , get into the project directory UniSupportSystem(ignore the __MACOSX folder if has) and install dependencies**
    ```
    pip install -r requirements.txt
    or 
