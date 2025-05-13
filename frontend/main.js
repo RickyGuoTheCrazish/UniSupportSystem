@@ -85,19 +85,110 @@ function addMessageToChat(role, content, agentName = null) {
     const contentElement = document.createElement('div');
     contentElement.className = 'message-content';
     
-    // Add agent label for assistant messages
-    if (role === 'assistant' && agentName) {
-        const agentLabel = document.createElement('div');
-        agentLabel.className = 'agent-label';
-        agentLabel.textContent = agentName;
-        contentElement.appendChild(agentLabel);
+    // Detect handoff messages (when an agent is transferring to another agent)
+    let isHandoffMessage = false;
+    let handoffAgentName = null;
+    
+    if (role === 'assistant' && content) {
+        // Check for handoff messages by detecting common phrases
+        const handoffPhrases = [
+            "transfer you to",
+            "connect you with",
+            "hand you off to",
+            "pass you to",
+            "would be better answered by"
+        ];
         
-        // Update the agent name in the header
-        agentNameDisplay.textContent = agentName;
+        for (const phrase of handoffPhrases) {
+            if (content.toLowerCase().includes(phrase.toLowerCase())) {
+                isHandoffMessage = true;
+                break;
+            }
+        }
+        
+        // Determine which agent is likely doing the handoff based on content
+        if (isHandoffMessage) {
+            // Agent mapping for reverse lookup
+            const agentMapping = {
+                "Triage Agent": ["course advisor", "university poet", "scheduling assistant"],
+                "Course Advisor Agent": ["triage agent", "university poet", "scheduling assistant"],
+                "University Poet Agent": ["triage agent", "course advisor", "scheduling assistant"],
+                "Scheduling Assistant Agent": ["triage agent", "course advisor", "university poet"]
+            };
+            
+            // Check which agent is being handed off to in the message
+            for (const [sourceAgent, targetPhrases] of Object.entries(agentMapping)) {
+                for (const phrase of targetPhrases) {
+                    if (content.toLowerCase().includes(phrase.toLowerCase()) && 
+                        agentName !== sourceAgent) {
+                        handoffAgentName = sourceAgent;
+                        break;
+                    }
+                }
+                if (handoffAgentName) break;
+            }
+            
+            // If we couldn't determine handoff agent, use a fallback
+            if (!handoffAgentName) {
+                // Default to Triage Agent as fallback source for handoffs
+                handoffAgentName = "Triage Agent";
+            }
+        }
     }
     
-    // Special formatting for haiku if from University Poet Agent
-    if (role === 'assistant' && agentName === 'University Poet Agent') {
+    // Add agent label based on the agent type
+    if (role === 'assistant') {
+        // Update the agent name in the header (always use current agent)
+        agentNameDisplay.textContent = agentName || 'Assistant';
+        
+        // For the message label, use handoff agent if detected
+        const agentLabel = document.createElement('div');
+        agentLabel.className = 'agent-label';
+        
+        if (isHandoffMessage && handoffAgentName) {
+            // Use the handoff agent name for this message
+            agentLabel.textContent = handoffAgentName;
+            // Add special styling for handoff messages
+            agentLabel.classList.add('handoff-message');
+            messageElement.classList.add('handoff-message');
+        } else {
+            // Use the agent name provided
+            agentLabel.textContent = agentName || 'Assistant';
+        }
+        
+        contentElement.appendChild(agentLabel);
+    } else if (role === 'system') {
+        // Add a system label
+        const systemLabel = document.createElement('div');
+        systemLabel.className = 'agent-label system';
+        systemLabel.textContent = 'System';
+        contentElement.appendChild(systemLabel);
+    }
+    
+    // Special formatting for Triage Agent
+    if (role === 'assistant' && agentName === 'Triage Agent') {
+        // Create a content container for the formatted message
+        const formattedContent = document.createElement('div');
+        formattedContent.className = 'formatted-content';
+        formattedContent.innerHTML = formatMessageContent(content);
+        contentElement.appendChild(formattedContent);
+        
+        // Add a special triage class to the message element
+        messageElement.classList.add('triage-message');
+    }
+    // Special formatting for Course Advisor Agent
+    else if (role === 'assistant' && agentName === 'Course Advisor Agent') {
+        // Create a content container for the formatted message
+        const formattedContent = document.createElement('div');
+        formattedContent.className = 'formatted-content';
+        formattedContent.innerHTML = formatMessageContent(content);
+        contentElement.appendChild(formattedContent);
+        
+        // Add a special advisor class to the message element
+        messageElement.classList.add('advisor-message');
+    }
+    // Special formatting for University Poet Agent
+    else if (role === 'assistant' && agentName === 'University Poet Agent') {
         // Try to detect haiku format (3 lines with specific syllable pattern)
         const lines = content.split('\n').filter(line => line.trim());
         if (lines.length === 3) {
@@ -113,10 +204,33 @@ function addMessageToChat(role, content, agentName = null) {
             
             contentElement.appendChild(haikuElement);
         } else {
-            contentElement.innerHTML = formatMessageContent(content);
+            // Create a content container for the formatted message
+            const formattedContent = document.createElement('div');
+            formattedContent.className = 'formatted-content';
+            formattedContent.innerHTML = formatMessageContent(content);
+            contentElement.appendChild(formattedContent);
         }
-    } else {
-        contentElement.innerHTML = formatMessageContent(content);
+        // Add a special poet class to the message element
+        messageElement.classList.add('poet-message');
+    }
+    // Special formatting for Scheduling Assistant Agent
+    else if (role === 'assistant' && agentName === 'Scheduling Assistant Agent') {
+        // Create a content container for the formatted message
+        const formattedContent = document.createElement('div');
+        formattedContent.className = 'formatted-content';
+        formattedContent.innerHTML = formatMessageContent(content);
+        contentElement.appendChild(formattedContent);
+        
+        // Add a special scheduling class to the message element
+        messageElement.classList.add('scheduling-message');
+    }
+    // Default formatting for all other messages
+    else {
+        // Create a content container for the formatted message
+        const formattedContent = document.createElement('div');
+        formattedContent.className = 'formatted-content';
+        formattedContent.innerHTML = formatMessageContent(content);
+        contentElement.appendChild(formattedContent);
     }
     
     // Add content to message

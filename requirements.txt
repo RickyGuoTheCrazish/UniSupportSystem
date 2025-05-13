@@ -1,8 +1,17 @@
+# Core framework
 django==5.0.2
+python-dotenv==1.0.0
+
+# OpenAI and Swarm
 openai>=1.3.0
 git+https://github.com/openai/swarm.git
+
+# ML and NLP libraries
+numpy>=1.24.0
+scikit-learn>=1.3.0
 sentence-transformers==2.2.2
-python-dotenv==1.0.0
 torch>=2.0.0
 transformers>=4.30.0
-scikit-learn>=1.3.0
+
+# Optional Django extensions
+django-extensions>=3.2.0
