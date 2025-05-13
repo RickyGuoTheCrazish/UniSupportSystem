@@ -7,7 +7,6 @@
 const chatMessages = document.getElementById('chat-messages');
 const userInput = document.getElementById('user-input');
 const sendButton = document.getElementById('send-button');
-const clearChatButton = document.getElementById('clear-chat');
 const agentNameDisplay = document.getElementById('agent-name');
 
 // State management
@@ -32,7 +31,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Set up event listeners
     sendButton.addEventListener('click', handleSendMessage);
     userInput.addEventListener('keydown', handleInputKeydown);
-    clearChatButton.addEventListener('click', handleClearChat);
     document.getElementById('new-chat').addEventListener('click', handleNewChat);
 });
 
@@ -251,22 +249,34 @@ function sendQueryToBackend(query) {
 }
 
 /**
- * Handles clearing the chat history
+ * Creates a brand new chat session or clears the existing one
  */
-function handleClearChat() {
+function handleNewChat() {
     if (isWaitingForResponse) {
         return;
     }
     
-    // Confirm before clearing
-    if (!confirm('Are you sure you want to clear the chat history?')) {
-        return;
+    // If there's an existing session, clear it on the server
+    if (sessionId) {
+        fetch('/api/clear/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ session_id: sessionId })
+        })
+        .then(response => response.json())
+        .catch(error => {
+            console.error('Error clearing chat:', error);
+        });
     }
     
-    // Clear chat interface
-    while (chatMessages.firstChild) {
-        chatMessages.removeChild(chatMessages.firstChild);
-    }
+    // Clear localStorage and reset session
+    localStorage.removeItem('uniSupportSessionId');
+    sessionId = null;
+    
+    // Clear the UI
+    clearChatMessages();
     
     // Reset agent name
     agentNameDisplay.textContent = 'Triage Agent';
@@ -274,38 +284,7 @@ function handleClearChat() {
     // Add welcome message
     addSystemWelcomeMessage();
     
-    console.log('Created new chat session');
-}
-
-/**
- * Clears the chat history but keeps the same session
- */
-function handleClearChat() {
-    if (!sessionId) {
-        clearChatMessages();
-        return;
-    }
-    
-    fetch('/api/clear/', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ session_id: sessionId })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.status === 'success') {
-            clearChatMessages();
-            agentNameDisplay.textContent = 'Triage Agent';
-            
-            // Add welcome message
-            addSystemWelcomeMessage();
-        }
-    })
-    .catch(error => {
-        console.error('Error clearing chat:', error);
-    });
+    console.log('Started new chat session');
 }
 
 /**

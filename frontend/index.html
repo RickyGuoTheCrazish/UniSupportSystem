@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>University Support Center</title>
-    <link rel="stylesheet" href="/static/style.css">
-    <script src="/static/main.js" defer></script>
+    <link rel="stylesheet" href="/static/style.css?v=1.1">
+    <script src="/static/main.js?v=1.1" defer></script>
 </head>
 <body>
     <div class="container">
@@ -18,8 +18,14 @@
             <div class="agent-info">
                 <div id="agent-name">Triage Agent</div>
                 <div class="chat-actions">
-                    <button id="new-chat" class="primary-button">New Chat</button>
-                    <button id="clear-chat">Clear Chat</button>
+                    <button id="new-chat" class="primary-button">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus-circle">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="8" x2="12" y2="16"></line>
+                            <line x1="8" y1="12" x2="16" y2="12"></line>
+                        </svg>
+                        New Chat
+                    </button>
                 </div>
             </div>
             

@@ -82,11 +82,12 @@ USE_I18N = True
 USE_TZ = True
 
 # Static files
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     PROJECT_ROOT / 'frontend',
 ]
-STATIC_ROOT = BASE_DIR / 'staticfiles'
+# Disable static root - we'll serve directly from the frontend directory
+# STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # Database field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
