@@ -77,16 +77,17 @@ def chat_endpoint(request):
         
         # Process the query using the client
         try:
-            response = process_query(
+            # Store the response from process_query
+            result = process_query(
                 user_query=user_query,
                 session_messages=existing_messages,
                 current_agent=session.current_agent
             )
             
             # Get updated information from the response
-            all_messages = response.get('messages', [])
-            current_agent = response.get('current_agent', session.current_agent)
-            agent_display_name = response.get('agent_display_name', 'Agent')
+            current_agent = result.get('current_agent', session.current_agent)
+            agent_display_name = result.get('agent_display_name', 'Agent')
+            all_messages = result.get('messages', [])
             
             # Save any new messages
             for msg in all_messages:
@@ -128,8 +129,10 @@ def chat_endpoint(request):
                     function_arguments=function_args
                 )
             
-            # Update the session's current agent
-            session.current_agent = current_agent
+            # Update the session's current agent with the potentially new agent from the result
+            # This ensures handoffs persist between requests
+            new_current_agent = result.get('current_agent', current_agent)
+            session.current_agent = new_current_agent
             session.save(update_fields=['current_agent'])
             
             # Find a suitable response content to return
